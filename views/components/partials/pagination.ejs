@@ -1,0 +1,61 @@
+<nav aria-label="Page navigation">
+    <ul class="pagination">
+        <% if (data.hasPrevPage) { %>
+            <li class="page-item">
+                <a class="page-link" href=<%= "?page=" +  data.prevPage + data.params %> aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+        <% } else { %>
+            <li class="page-item disabled">
+                <span class="page-link" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </span>
+            </li>
+        <% } %>
+        <% if (data.page > 6) { %>
+            <li class="page-item">
+                <a class="page-link" href=<%= "?page=1" + data.params %> aria-label="Previous">
+                    <span aria-hidden="true">1</span>
+                </a>
+            </li>
+            <li class="page-item disabled">
+                <span class="page-link" aria-label="Previous">
+                    <span aria-hidden="true">...</span>
+                </span>
+            </li>
+        <% } %>
+        <% const start = data.page > 5 ? data.page - 5 : 1  %>
+        <% const end = data.totalPages - data.page > 5 ? data.page + 5 : data.totalPages  %>
+        <% for (let i = start; i <= end; i++) { %>
+            <li class="page-item <%= data.page == i ? 'active' : '' %>">
+                <a class="page-link" href=<%= "?page=" +  i + data.params %>><%= i %></a>
+            </li>
+        <% } %>
+        <% if (data.totalPages - data.page > 6) { %>
+            <li class="page-item disabled">
+                <span class="page-link" aria-label="Previous">
+                    <span aria-hidden="true">...</span>
+                </span>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href=<%= "?page=" +  data.totalPages + data.params %> aria-label="Previous">
+                    <span aria-hidden="true"><%= data.totalPages %></span>
+                </a>
+            </li>
+        <% } %>
+        <% if (data.hasNextPage) { %>
+            <li class="page-item">
+                <a class="page-link" href=<%= "?page=" +  data.nextPage + data.params %> aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        <% } else { %>
+            <li class="page-item disabled">
+                <span class="page-link" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </span>
+            </li>
+        <% } %>
+    </ul>
+</nav>

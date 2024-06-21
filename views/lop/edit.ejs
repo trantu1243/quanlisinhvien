@@ -1,0 +1,121 @@
+<%- include('../components/header/table-header') %>
+
+<div class="wrapper">
+  
+    <%- include('../components/sidebar/sidebar') %>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>Lớp</h1>
+          </div>
+         
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card card-primary">
+                        <div class="card-header">
+                          <h3 class="card-title">Add</h3>
+                        </div>
+                       
+                        <form action=<%= `/lop/edit/${lop._id}` %> method="POST">
+                            
+                            <div class="card-body">
+                                <% if (error) { %>
+                                    <div class="alert alert-danger"><%= error %></div>
+                                <% } %>
+                                <% if (success) { %>
+                                    <div class="alert alert-success"><%= success %></div>
+                                <% } %>
+                                <div class="form-group">
+                                    <label for="malop">Mã lớp</label>
+                                    <input name="malop" value="<%= lop.malop %>" type="text" class="form-control" id="malop" placeholder="Nhập mã lớp" autocomplete="none" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="tenlop">Tên lớp</label>
+                                    <input name="tenlop" value="<%= lop.tenlop %>" type="text" class="form-control" id="tenlop" placeholder="Nhập tên lớp" autocomplete="none" required>
+                                </div>
+
+                                <div class="form-group">
+                                  <label>Mã ngành</label>
+                                  <select name="khoaid" value="<%= String(lop.khoaid) %>" class="form-control" required>
+                                      <% if (khoas && Array.isArray(khoas)) { %>
+                                        <% khoas.forEach(khoa => { %>
+                                            <option value="<%= khoa._id %>" <%= String(lop.khoaid) === String(khoa._id) ? 'selected' : '' %>>
+                                                <%= khoa.tenkhoa %>
+                                            </option>
+                                        <% }) %>
+                                      <% } %>
+                                  </select>
+                                </div>
+
+                                <div class="form-group">
+                                  <label>Mã hệ ĐT</label>
+                                  <select name="heDTid" %>" class="form-control" required>
+                                      <% if (heDTs && Array.isArray(heDTs)) { %>
+                                        <% heDTs.forEach(heDT => { %>
+                                            <option value="<%= heDT._id %>" <%= String(lop.heDTid) === String(heDT._id) ? 'selected' : '' %>>
+                                                <%= heDT.tenheDT %>
+                                            </option>
+                                        <% }) %>
+                                      <% } %>
+                                  </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Mã khóa</label>
+                                    <select name="khoahocid" class="form-control" required>
+                                        <% if (khoahocs && Array.isArray(khoahocs)) { %>
+                                            <% khoahocs.forEach(khoahoc => { %>
+                                                <option value="<%= khoahoc._id %>" <%= String(lop.khoahocid) === String(khoahoc._id) ? 'selected' : '' %>>
+                                                    <%= khoahoc.tenkhoahoc %>
+                                                </option>
+                                            <% }) %>
+                                        <% } %>
+                                    </select>
+                                </div>
+
+                            </div>
+    
+                            <div class="card-footer">
+                                <button type="submit" class="btn btn-primary">Save</button>
+                            </div>
+                        </form>
+                        <!-- /.card-body -->
+                      </div>
+                    <!-- /.card -->
+                </div>
+            </div>
+        </div><!--/. container-fluid -->
+      <!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+  <footer class="main-footer">
+    <div class="float-right d-none d-sm-block">
+      <b>Version</b> 3.2.0
+    </div>
+    <strong>Copyright &copy; 2014-2021 <a href="https://adminlte.io">AdminLTE.io</a>.</strong> All rights reserved.
+  </footer>
+
+  <!-- Control Sidebar -->
+  <aside class="control-sidebar control-sidebar-dark">
+    <!-- Control sidebar content goes here -->
+  </aside>
+  <!-- /.control-sidebar -->
+</div>
+<!-- ./wrapper -->
+
+<%- include('../components/footer/table-footer') %>

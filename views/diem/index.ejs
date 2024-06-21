@@ -1,0 +1,102 @@
+<%- include('../components/header/table-header') %>
+
+<div class="wrapper">
+  
+    <%- include('../components/sidebar/sidebar') %>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>Điểm</h1>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12">
+            <div class="card">
+              <div class="card-body table-responsive p-0">
+                  <table class="table table-hover text-nowrap">
+                      <thead>
+                      <tr>
+                            <th>Mã SV</th>
+                            <th>Tên SV</th>
+                            <th>Tên Lớp</th>
+                            <th>Mã MH</th>
+                            <th>Tên MH</th>       
+                            <th>TP1</th>
+                            <th>TP2</th>
+                            <th>Thi</th>
+                            <th>KTHP</th>
+                            <th>Đạt</th>
+                            <th>Action</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                          <% if (diems.docs && Array.isArray(diems.docs)) { %>
+                            <% for(let i=0; i<diems.docs.length; i++) {%>
+                              <tr>
+                                  <td><%= diems.docs[i].maSV %></td>
+                                  <td><%= diems.docs[i].tenSV %></td>
+                                  <td><%= diems.docs[i].tenlop %></td>
+                                  <td><%= diems.docs[i].maMH %></td>
+                                  <td><%= diems.docs[i].tenMH %></td>
+                                  <td><%= diems.docs[i].tp1 %></td>
+                                  <td><%= diems.docs[i].tp2 %></td>
+                                  <td><%= diems.docs[i].thi %></td>
+                                  <td><%= diems.docs[i].kthp %></td>
+                                  <td><%= diems.docs[i].danhgia %></td>
+                                  <td>
+                                      <a href=<%= `/diem/edit/${diems.docs[i]._id}` %> class="btn btn-primary">Edit</a>
+                                      <form action=<%= `/diem/delete/${diems.docs[i]._id}` %> method="POST"
+                                            style="display: inline-block;">
+                                          <button type="submit" class="btn btn-danger">Delete</button>
+                                      </form>
+                                  </td>
+                              </tr>
+                            <% } %>
+                          <% } %>
+                      </tbody>
+                  </table>
+              </div>
+              <!-- /.card-body -->
+              <div class="card-footer">
+                <%- include('../components/partials/pagination', { data: diems }) %>
+
+              </div>
+              <!-- /.card-footer -->
+          </div>
+          </div>
+          <!-- /.col -->
+        </div>
+        <!-- /.row -->
+      </div>
+      <!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+  <footer class="main-footer">
+    <div class="float-right d-none d-sm-block">
+      <b>Version</b> 3.2.0
+    </div>
+    <strong>Copyright &copy; 2014-2021 <a href="https://adminlte.io">AdminLTE.io</a>.</strong> All rights reserved.
+  </footer>
+
+  <!-- Control Sidebar -->
+  <aside class="control-sidebar control-sidebar-dark">
+    <!-- Control sidebar content goes here -->
+  </aside>
+  <!-- /.control-sidebar -->
+</div>
+<!-- ./wrapper -->
+
+<%- include('../components/footer/table-footer') %>
