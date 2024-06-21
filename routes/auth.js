@@ -19,7 +19,7 @@ router.post('/login', async (req, res) => {
         return res.send('Invalid password');
       }
       req.session.user = user;
-      res.redirect('/');
+      res.redirect('/diem');
     } catch (error) {
       res.send('Error: ' + error.message);
     }
@@ -27,7 +27,7 @@ router.post('/login', async (req, res) => {
   
   router.get('/logout', (req, res) => {
     req.session.destroy();
-    res.redirect('/');
+    res.redirect('/auth/login');
   });
 
 module.exports = router;

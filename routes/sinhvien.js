@@ -2,6 +2,7 @@ const express = require('express');
 const Lop = require('../models/lop');
 const Sinhvien = require('../models/sinhvien');
 const mongoose = require('mongoose');
+const authMiddleware = require('../middleware/auth');
 
 const { ObjectId } = mongoose.Types;
 const router = express.Router();
@@ -25,7 +26,7 @@ function formatDate2(date) {
 }
 
 
-router.get("/", async function(req, res, next) {
+router.get("/", authMiddleware, async function(req, res, next) {
     const page = parseInt(req.query.page) || 1;
     const masv = req.query.maSV || "";
     const malop = req.query.malop || "";
@@ -89,7 +90,7 @@ router.get("/", async function(req, res, next) {
         }));
 
         const docs = [];
-        const totalPages = formattedResult.length % 10 === 0 ? formattedResult.length / 10 : formattedResult.length / 10+1;
+        const totalPages = Math.ceil(formattedResult.length / 10);;
         for (let i=(page-1)*10; i<page*10; i++){
             if (i < formattedResult.length) docs.push(formattedResult[i]);
         }
@@ -112,19 +113,19 @@ router.get("/", async function(req, res, next) {
 });
 
 
-router.get('/add', async function(req, res, next) {
+router.get('/add', authMiddleware, async function(req, res, next) {
     const lops = await Lop.find();
     res.render('sinhvien/add', {lops, error: null, success: null});
 });
 
-router.get('/edit/:id', async function(req, res, next) {
+router.get('/edit/:id', authMiddleware, async function(req, res, next) {
     let lops = await Lop.find();
     const sinhvien = await Sinhvien.findById(req.params.id);
     const ngaysinh = formatDate2(sinhvien.ngaysinh);
     res.render('sinhvien/edit', {sinhvien, ngaysinh, lops, error: null, success: null});
 });
 
-router.post('/add', async function(req, res, next) {
+router.post('/add', authMiddleware, async function(req, res, next) {
     const lops = await Lop.find();
     try {
         let { maSV, tenSV, gioitinh, ngaysinh, lopid, quequan } = req.body;
@@ -144,7 +145,7 @@ router.post('/add', async function(req, res, next) {
     }
 });
 
-router.post('/edit/:id', async function(req, res, next) {
+router.post('/edit/:id', authMiddleware, async function(req, res, next) {
     const lops = await Lop.find();
     const sinhvien = await Sinhvien.findById(req.params.id);
     const ngaysinh = formatDate2(sinhvien.ngaysinh);
@@ -163,7 +164,7 @@ router.post('/edit/:id', async function(req, res, next) {
 });
 
 
-router.post('/delete/:id', async function(req, res, next) {
+router.post('/delete/:id', authMiddleware, async function(req, res, next) {
     try{
         await Sinhvien.findByIdAndDelete(req.params.id);
         res.redirect(`/sinhvien?`);

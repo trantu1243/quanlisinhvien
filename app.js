@@ -7,7 +7,6 @@ const session = require('express-session');
 const mongoose = require('mongoose');
 require('dotenv').config()
 
-const indexRouter = require('./routes/index');
 const authRouter = require('./routes/auth');
 const monhocRouter = require('./routes/monhoc');
 const heDTRouter = require('./routes/heDT');
@@ -45,7 +44,6 @@ app.use(session({
 }));
 
 // Routes
-app.use('/', indexRouter);
 app.use('/auth', authRouter);
 app.use('/monhoc', monhocRouter);
 app.use('/heDT', heDTRouter);

@@ -2,65 +2,133 @@ const express = require('express');
 const Monhoc = require('../models/monhoc');
 const Sinhvien = require('../models/sinhvien');
 const Diem = require('../models/diem');
+const authMiddleware = require('../middleware/auth');
 
 const router = express.Router();
 
-router.get('/', async function(req, res, next) {
+router.get('/', authMiddleware, async function(req, res, next) {
     const page = parseInt(req.query.page) || 1;
     const limit = 10;
-    const options = {
-        page,
-        limit,
-        populate: [
-            { path: 'MHid', select: 'maMH tenMH' },
-            { 
-                path: 'SVid', 
-                select: 'maSV tenSV lopid',
-                populate: {
-                    path: 'lopid',
-                    select: 'tenlop' 
+
+    const maSV = req.query.maSV || "";
+    const maMH = req.query.maMH || "";
+    const malop = req.query.malop || "";
+    const danhgia = req.query.danhgia || "";
+
+    let matchCondition = {};
+
+    let params = '';
+
+    if (maSV) {
+        const sinhvien = await Sinhvien.findOne({ maSV });
+        if (sinhvien) {
+            matchCondition.SVid = sinhvien._id;
+        } else {
+            matchCondition.SVid = "-1";
+        }
+        params += "&maSV=" + maSV;
+    }
+
+    if (maMH) {
+        const monhoc = await Monhoc.findOne({ maMH });
+        if (monhoc) {
+            matchCondition.MHid = monhoc._id;
+        } else {
+            matchCondition.MHid = "-1";
+        }
+        params += "&maMH=" + maMH;
+    }
+
+    if (danhgia) {
+        matchCondition.danhgia = danhgia === '1';
+        params += "&danhgia=" + danhgia;
+    }
+
+    if (malop) {
+        params += "&malop=" + malop;
+    }
+
+    try {
+        const aggregateQuery = [
+            { $match: matchCondition },
+            {
+                $lookup: {
+                    from: 'sinhviens',
+                    localField: 'SVid',
+                    foreignField: '_id',
+                    as: 'sinhvien_info'
                 }
             },
-            
-        ],
-        select: 'MHid SVid tp1 tp2 thi kthp danhgia'
-    };
+            { $unwind: '$sinhvien_info' },
+            {
+                $lookup: {
+                    from: 'lops',
+                    localField: 'sinhvien_info.lopid',
+                    foreignField: '_id',
+                    as: 'lop_info'
+                }
+            },
+            { $unwind: '$lop_info' },
+            {
+                $lookup: {
+                    from: 'monhocs',
+                    localField: 'MHid',
+                    foreignField: '_id',
+                    as: 'monhoc_info'
+                }
+            },
+            { $unwind: '$monhoc_info' },
+            {
+                $match: malop ? { 'lop_info.malop': malop } : {}
+            },
+            {
+                $project: {
+                    _id: 1,
+                    maSV: '$sinhvien_info.maSV',
+                    tenSV: '$sinhvien_info.tenSV',
+                    tenlop: '$lop_info.tenlop',
+                    maMH: '$monhoc_info.maMH',
+                    tenMH: '$monhoc_info.tenMH',
+                    tp1: 1,
+                    tp2: 1,
+                    thi: 1,
+                    kthp: 1,
+                    danhgia: 1
+                }
+            }
+        ];
+    
+        const formattedResult = await Diem.aggregate(aggregateQuery);
 
-    const result = await Diem.paginate({}, options);
+        const docs = [];
+        const totalPages = Math.ceil(formattedResult.length / 10);;
+        for (let i=(page-1)*10; i<page*10; i++){
+            if (i < formattedResult.length) docs.push(formattedResult[i]);
+        }
 
-    const formattedResult = result.docs.map(diem => ({
-        _id: diem._id,
-        maSV: diem.SVid.maSV,
-        tenSV: diem.SVid.tenSV,
-        tenlop:  diem.SVid.lopid.tenlop,
-        maMH: diem.MHid.maMH,
-        tenMH: diem.MHid.tenMH,
-        tp1: diem.tp1,
-        tp2: diem.tp2,
-        thi: diem.thi,
-        kthp: diem.kthp,
-        danhgia: diem.danhgia
-    }));
-    const diems =  {
-        docs: formattedResult,
-        totalDocs: result.totalDocs,
-        limit: result.limit,
-        page: result.page,
-        totalPages: result.totalPages,
-        hasNextPage: result.hasNextPage,
-        hasPrevPage: result.hasPrevPage,
-        nextPage: result.nextPage,
-        prevPage: result.prevPage
-    };
-
-    res.render('diem/index', {diems});
+        res.render('diem/index', { maSV, malop, maMH, danhgia, diems: {
+            docs: docs,
+            totalDocs: formattedResult.length,
+            limit,
+            page,
+            totalPages: totalPages,
+            hasNextPage: page < totalPages,
+            hasPrevPage: page > 1,
+            nextPage: page + 1,
+            prevPage: page - 1,
+            params
+        }});
+    }
+    catch (e) {
+        console.log(e);
+    }
 });
 
-router.get('/add', function(req, res, next) {
+router.get('/add', authMiddleware, function(req, res, next) {
     res.render('diem/add', { error: null, success: null });
 });
 
-router.get('/edit/:id', async function(req, res, next) {
+router.get('/edit/:id', authMiddleware, async function(req, res, next) {
     const diem = await Diem.findById(req.params.id);
     const sinhvien = await Sinhvien.findById(String(diem.SVid));
     const monhoc = await Monhoc.findById(String(diem.MHid));
@@ -70,7 +138,7 @@ router.get('/edit/:id', async function(req, res, next) {
 });
 
 
-router.post('/add', async function(req, res, next) {
+router.post('/add', authMiddleware, async function(req, res, next) {
     try {
         const { maSV, maMH, tp1, tp2, thi} = req.body;
         const sinhvien = await Sinhvien.findOne({maSV});
@@ -99,7 +167,7 @@ router.post('/add', async function(req, res, next) {
     }
 });
 
-router.post('/edit/:id', async function(req, res, next) {
+router.post('/edit/:id', authMiddleware, async function(req, res, next) {
     const diem = await Diem.findById(req.params.id);
     const sinhvien = await Sinhvien.findById(String(diem.SVid));
     const monhoc = await Monhoc.findById(String(diem.MHid));
@@ -133,7 +201,7 @@ router.post('/edit/:id', async function(req, res, next) {
     }
 });
 
-router.post('/delete/:id', async function(req, res, next) {
+router.post('/delete/:id', authMiddleware, async function(req, res, next) {
     try{
         await Diem.findByIdAndDelete(req.params.id);
         res.redirect("/diem");

@@ -9,7 +9,7 @@ const Khoa = require('../models/khoa');
 const Khoahoc = require('../models/khoahoc');
 const HeDT = require('../models/heDT');
 
-router.get('/', async function(req, res, next) {
+router.get('/', authMiddleware, async function(req, res, next) {
     const page = parseInt(req.query.page) || 1;
     const limit = 10;
     const options = {
@@ -49,14 +49,14 @@ router.get('/', async function(req, res, next) {
     res.render('lop/index', {lops});
 });
 
-router.get('/add', async function(req, res, next) {
+router.get('/add', authMiddleware, async function(req, res, next) {
     const khoas = await Khoa.find();
     const khoahocs = await Khoahoc.find();
     const heDTs = await HeDT.find();
     res.render('lop/add', {khoas, khoahocs, heDTs, error: null, success: null});
 });
 
-router.get('/edit/:id', async function(req, res, next) {
+router.get('/edit/:id', authMiddleware, async function(req, res, next) {
     const lop = await Lop.findById(req.params.id);
     const khoas = await Khoa.find();
     const khoahocs = await Khoahoc.find();
@@ -64,7 +64,7 @@ router.get('/edit/:id', async function(req, res, next) {
     res.render('lop/edit', {lop, khoas, khoahocs, heDTs, error: null, success: null});
 });
 
-router.post('/add', async function(req, res, next) {
+router.post('/add', authMiddleware, async function(req, res, next) {
     const khoas = await Khoa.find();
     const khoahocs = await Khoahoc.find();
     const heDTs = await HeDT.find();
@@ -86,7 +86,7 @@ router.post('/add', async function(req, res, next) {
     }
 });
 
-router.post('/edit/:id', async function(req, res, next) {
+router.post('/edit/:id', authMiddleware, async function(req, res, next) {
     const khoas = await Khoa.find();
     const khoahocs = await Khoahoc.find();
     const heDTs = await HeDT.find();
@@ -103,7 +103,7 @@ router.post('/edit/:id', async function(req, res, next) {
     }
 });
 
-router.post('/delete/:id', async function(req, res, next){
+router.post('/delete/:id', authMiddleware, async function(req, res, next){
     try{
         await Lop.findByIdAndDelete(req.params.id);
         res.redirect("/lop");

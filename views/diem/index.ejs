@@ -17,6 +17,42 @@
       </div><!-- /.container-fluid -->
     </section>
 
+    <section class="content" style="margin-bottom: 20px;">
+      <div class="container-fluid">
+          <div class="row">               
+              <div class="col-12">
+                  <form action="/diem" method="GET">
+                      <div class="row">
+                          <div class="col-3">
+                              <label for="masv">Mã sinh viên</label>
+                              <input type="text" name="maSV" value="<%= maSV %>" class="form-control" id="masv" placeholder="Tìm theo mã sinh viên">
+                          </div>
+                          <div class="col-3">
+                            <label for="maMH">Mã môn học</label>
+                            <input type="text" name="maMH" value="<%= maMH %>" class="form-control" id="maMH" placeholder="Tìm theo mã sinh viên">
+                          </div>
+                          <div class="col-3">
+                              <label for="malop">Lớp</label>
+                              <input type="text" name="malop" value="<%= malop %>" class="form-control" id="malop" placeholder="Lọc bằng tên lớp">
+                          </div>
+                          <div class="col-3">
+                              <label for="danhgia">Đạt</label>
+                              <select name="danhgia" value="<%= danhgia %>"  class="form-control" id="gioitinh">
+                                  <option value='' <%= danhgia === '' && 'selected' %>>-- Lựa chọn --</option> 
+                                  <option value='1' <%= danhgia == '1' && 'selected' %>>Đạt</option> 
+                                  <option value='0' <%= danhgia == '0' && 'selected' %>>Không đạt</option>     
+                              </select>
+                          </div>
+                          <div class="col-2">
+                              <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Filter</button>
+                          </div>
+                      </div>
+                  </form>
+              </div>
+          </div>
+      </div>
+  </section>
+
     <!-- Main content -->
     <section class="content">
       <div class="container-fluid">
